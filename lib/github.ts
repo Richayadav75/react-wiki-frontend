@@ -2,8 +2,6 @@ import { Topic, TopicDetail } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIGURATION
-// Update GITHUB_USER and GITHUB_REPO to point to YOUR react-wiki data repo
-// once you push it to GitHub. Until then, the app uses MOCK_TOPICS as fallback.
 // ─────────────────────────────────────────────────────────────────────────────
 const GITHUB_USER = 'Richayadav75';
 const GITHUB_REPO = 'react-wiki';
@@ -13,7 +11,7 @@ const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO
 const API_BASE = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents`;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOCK DATA (used when GITHUB_USER is not set or fetch fails)
+// MOCK DATA (fallback if GitHub fetch fails)
 // ─────────────────────────────────────────────────────────────────────────────
 export const MOCK_TOPICS: Topic[] = [
   { slug: 'useState',            name: 'useState',            category: 'Hooks',             difficulty: 'Beginner',     related: ['useReducer', 'useRef'] },
@@ -41,7 +39,7 @@ function parseFrontMatter(content: string, slug: string): Topic {
     if (match) {
       meta[match[1].trim().toLowerCase()] = match[2].trim();
     }
-    // Stop after blank line or heading — front matter is done
+    // Stop at heading — front matter is done
     if (line.startsWith('#') && Object.keys(meta).length > 0) break;
   }
 
@@ -61,18 +59,13 @@ function parseFrontMatter(content: string, slug: string): Topic {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FETCH TOPIC LIST
-// Lists top-level directories in the GitHub repo via the Contents API.
-// Falls back to MOCK_TOPICS if the repo isn't configured or the request fails.
+// Lists top-level directories via the GitHub Contents API.
+// Falls back to MOCK_TOPICS if the request fails.
 // ─────────────────────────────────────────────────────────────────────────────
 export async function fetchTopicList(): Promise<Topic[]> {
-  if (GITHUB_USER === 'YOUR_GITHUB_USERNAME') {
-    // Not configured yet — use mock data
-    return MOCK_TOPICS;
-  }
-
   try {
     const res = await fetch(API_BASE, {
-      next: { revalidate: 3600 }, // cache for 1 hour in Next.js
+      next: { revalidate: 3600 },
       headers: { Accept: 'application/vnd.github+json' },
     });
 
@@ -81,7 +74,6 @@ export async function fetchTopicList(): Promise<Topic[]> {
     const items: Array<{ name: string; type: string }> = await res.json();
     const folders = items.filter(i => i.type === 'dir' && !i.name.startsWith('.'));
 
-    // For each folder, fetch its README to extract front-matter meta
     const topics = await Promise.all(
       folders.map(async (folder): Promise<Topic> => {
         try {
@@ -108,33 +100,31 @@ export async function fetchTopicList(): Promise<Topic[]> {
 // ─────────────────────────────────────────────────────────────────────────────
 // FETCH TOPIC DETAIL
 // Fetches the raw README.md for a given topic slug.
-// Falls back to a placeholder when not configured.
+// Falls back to mock data on failure.
 // ─────────────────────────────────────────────────────────────────────────────
-
 const MOCK_CONTENT: Record<string, string> = {
   useState: `- Category: Hooks\n- Difficulty: Beginner\n- Related: useReducer, useRef\n\n\`useState\` is the most fundamental React hook. It adds **reactive state** to a function component.\n\n## Syntax\n\n\`\`\`tsx\nconst [value, setValue] = useState<Type>(initialValue);\n\`\`\`\n\n## Example\n\n\`\`\`tsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  return <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>;\n}\n\`\`\`\n\n## Common Pitfalls\n\n- State updates are asynchronous\n- Always use functional updates when new state depends on previous\n- Never mutate state directly\n\n## Learn More\n\n- [React Docs — useState](https://react.dev/reference/react/useState)`,
 };
 
 export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null> {
-  // Try GitHub first (if configured)
-  if (GITHUB_USER !== 'YOUR_GITHUB_USERNAME') {
-    try {
-      const res = await fetch(`${RAW_BASE}/${slug}/README.md`, {
-        next: { revalidate: 3600 },
-      });
-      if (res.ok) {
-        const content = await res.text();
-        const meta = parseFrontMatter(content, slug);
-        return { ...meta, content };
-      }
-    } catch {
-      // fall through to mock
+  // Always try GitHub first, fall back to mock on error
+  try {
+    const res = await fetch(`${RAW_BASE}/${slug}/README.md`, {
+      next: { revalidate: 3600 },
+    });
+    if (res.ok) {
+      const content = await res.text();
+      const meta = parseFrontMatter(content, slug);
+      return { ...meta, content };
     }
+  } catch {
+    // fall through to mock
   }
 
-  // Local mock fallback
   const mockMeta = MOCK_TOPICS.find(t => t.slug === slug);
-  const content = MOCK_CONTENT[slug] ?? `# ${slug}\n\nContent coming soon. Add a README.md to the \`${slug}/\` folder in your react-wiki repo.`;
+  const content =
+    MOCK_CONTENT[slug] ??
+    `# ${slug}\n\nContent coming soon. Add a README.md to the \`${slug}/\` folder in your react-wiki repo.`;
 
   if (!mockMeta) return null;
   return { ...mockMeta, content };
