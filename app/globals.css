@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Design Tokens ─── */
+:root {
+  --bg:           hsl(225, 15%, 9%);
+  --bg-card:      hsl(225, 15%, 13%);
+  --bg-card-hover:hsl(225, 15%, 16%);
+  --border:       hsl(225, 15%, 20%);
+  --border-hover: hsl(194, 60%, 40%);
+
+  --accent:       hsl(194, 100%, 56%);   /* React cyan */
+  --accent-glow:  hsla(194, 100%, 56%, 0.15);
+  --accent-soft:  hsla(194, 100%, 56%, 0.08);
+
+  --text-primary:   hsl(210, 20%, 95%);
+  --text-secondary: hsl(210, 15%, 65%);
+  --text-muted:     hsl(210, 10%, 45%);
+
+  --diff-beginner:    hsl(145, 60%, 40%);
+  --diff-intermediate:hsl(40,  90%, 50%);
+  --diff-advanced:    hsl(355, 70%, 55%);
+
+  --diff-beginner-bg:    hsla(145, 60%, 40%, 0.12);
+  --diff-intermediate-bg:hsla(40,  90%, 50%, 0.12);
+  --diff-advanced-bg:    hsla(355, 70%, 55%, 0.12);
+
+  --radius-sm: 6px;
+  --radius:    12px;
+  --radius-lg: 18px;
+
+  --shadow: 0 4px 24px hsla(0, 0%, 0%, 0.4);
+  --shadow-card: 0 2px 12px hsla(0, 0%, 0%, 0.25);
+
+  --transition: 200ms ease;
+}
+
+/* ─── Reset & Base ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+img, svg {
+  max-width: 100%;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ─── Utility ─── */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ─── Animated gradient background orbs ─── */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsla(194, 100%, 56%, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -200px;
+  left: -200px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsla(265, 80%, 60%, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
