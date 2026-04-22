@@ -1,0 +1,108 @@
+.probRow {
+    border-bottom: 0.5px solid var(--rule-light);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.probRow:hover {
+    background: var(--paper2);
+}
+
+.probRow.active {
+    background: var(--red-bg) !important;
+}
+
+.active .probTitleLink {
+    color: var(--red) !important;
+}
+
+.active .readBtn {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.probNumCell {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink3);
+    vertical-align: middle;
+    padding: 14px 10px 14px 0;
+}
+
+.checkCircle {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--rule-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: var(--ink3);
+    opacity: 0.6;
+}
+
+.probTitleCell {
+    padding: 14px 10px;
+    vertical-align: middle;
+}
+
+.probTitleLink {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+    line-height: 1.2;
+}
+
+.probByline {
+    font-size: 11px;
+    color: var(--ink3);
+    display: block;
+    margin-top: 2px;
+}
+
+.diffPill {
+    font-size: 9px;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.diffPill.beginner {
+    color: var(--success-text);
+}
+
+.diffPill.intermediate {
+    color: var(--warning-text);
+}
+
+.diffPill.advanced {
+    color: var(--danger-text);
+}
+
+.probArrowCell {
+    text-align: right;
+    vertical-align: middle;
+    padding-right: 0;
+}
+
+.readBtn {
+    font-family: var(--serif);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 4px 12px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.probRow:hover .readBtn {
+    background: var(--ink);
+    color: var(--paper);
+}

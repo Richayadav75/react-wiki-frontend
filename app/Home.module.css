@@ -1,0 +1,240 @@
+.app {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    transition: all 0.35s ease-in-out;
+}
+
+.panelOpen .main {
+    margin-right: var(--panel);
+}
+
+.focusMode .main {
+    margin-right: 0;
+}
+
+.hero {
+    border-bottom: 3px double var(--rule);
+    padding: 28px 0 24px;
+}
+
+.heroColumns {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0 24px;
+}
+
+.colDivider {
+    background: var(--rule-light);
+}
+
+.heroLeft {
+    padding-right: 24px;
+}
+
+.kicker {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.heroHeadline {
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 10px;
+}
+
+.heroHeadline em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink2);
+}
+
+.heroDeck {
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.65;
+    border-top: 0.5px solid var(--rule-light);
+    padding-top: 10px;
+}
+
+.heroDeck a {
+    color: var(--red);
+    text-decoration: underline;
+}
+
+.statGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule-light);
+    border: 0.5px solid var(--rule-light);
+    margin-top: 10px;
+}
+
+.statCell {
+    background: var(--paper);
+    padding: 12px 14px;
+}
+
+.statCellVal {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+}
+
+.statCellLbl {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink3);
+    margin-top: 3px;
+}
+
+.problemsSection {
+    padding: 0 0 60px;
+}
+
+.progressSection {
+    margin-top: 12px;
+}
+
+.progressLabelRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink3);
+    margin-bottom: 4px;
+}
+
+.progressTrack {
+    height: 2px;
+    background: var(--rule-light);
+}
+
+.progressFill {
+    height: 100%;
+    background: var(--red);
+    transition: width 0.4s ease;
+}
+
+.filterBar {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule-light);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filterLabel {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink3);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.ftags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.diffTags {
+    display: flex;
+    gap: 5px;
+    margin-left: auto;
+}
+
+.dtag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: var(--body);
+    border: none;
+    background: var(--paper);
+    transition: opacity 0.15s;
+}
+
+.dtag.beginner {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.dtag.intermediate {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+}
+
+.dtag.advanced {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+.dtag.off {
+    opacity: 0.35;
+}
+
+.sectionRule {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 14px;
+}
+
+.sectionRuleLine {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+}
+
+.sectionRuleLabel {
+    font-family: var(--serif);
+    font-size: 12px;
+    font-style: italic;
+    color: var(--ink2);
+    white-space: nowrap;
+}
+
+.probTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.probTable thead tr {
+    border-bottom: 2px solid var(--rule);
+}
+
+.probTable th {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    padding: 6px 10px 6px 0;
+    text-align: left;
+    font-family: var(--body);
+}
+
+.probTable th:last-child {
+    text-align: right;
+}
