@@ -17,7 +17,7 @@ export default function HomeClient({ topics }: Props) {
   const [activeDifficulty, setActiveDifficulty] = useState(ALL);
 
   const categories = useMemo(() => {
-    const cats = [...new Set(topics.map(t => t.category))];
+    const cats = Array.from(new Set(topics.map(t => t.category)));
     return [ALL, ...cats];
   }, [topics]);
 
