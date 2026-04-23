@@ -286,3 +286,15 @@
         transform: rotate(360deg);
     }
 }
+
+.emptyState {
+    padding: 32px;
+    text-align: center;
+    color: var(--ink3);
+    font-style: italic;
+    font-size: 13px;
+    border: 1px dashed var(--rule-light);
+    border-radius: 4px;
+    margin-top: 12px;
+}
+

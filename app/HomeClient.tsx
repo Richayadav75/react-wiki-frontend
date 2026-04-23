@@ -11,6 +11,7 @@ import { Topic, TopicDetail } from "@/lib/types";
 function HomeContent({ initialTopics }: { initialTopics: Topic[] }) {
     const searchParams = useSearchParams();
     const [topicFilter, setTopicFilter] = useState(searchParams.get("topic") || "All Concepts");
+    const currentTrack = searchParams.get("track") || "React";
     const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
     const [selectedTopic, setSelectedTopic] = useState<TopicDetail | Topic | null>(null);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -32,9 +33,21 @@ function HomeContent({ initialTopics }: { initialTopics: Topic[] }) {
         setHiddenDiffs(next);
     };
 
-    const filteredByTopic = topicFilter === "All Concepts"
-        ? initialTopics
-        : initialTopics.filter(t => t.category.toLowerCase() === topicFilter.toLowerCase());
+    const reactCategories = ["Hooks", "State Management", "Fundamentals", "Performance", "Patterns"];
+    const jsCategories = ["JavaScript", "Core Concepts of JavaScript", "Interview Questions", "Practice"];
+
+    const filteredByTrack = initialTopics.filter(t => {
+        if (currentTrack === "React") {
+            return reactCategories.includes(t.category);
+        } else {
+            return jsCategories.includes(t.category);
+        }
+    });
+
+    const isAll = topicFilter.startsWith("All ");
+    const filteredByTopic = isAll
+        ? filteredByTrack
+        : filteredByTrack.filter(t => t.category.toLowerCase() === topicFilter.toLowerCase());
 
     const filtered = filteredByTopic.filter(t => !hiddenDiffs.has(t.difficulty));
 
@@ -83,9 +96,9 @@ function HomeContent({ initialTopics }: { initialTopics: Topic[] }) {
                         <div className={styles.heroColumns}>
                             <div className={styles.heroLeft}>
                                 <span className={styles.kicker}>✦ Live from GitHub</span>
-                                <h1 className={styles.heroHeadline}>Master <em>React Hooks</em> & Fundamentals, One Concept at a Time</h1>
+                                <h1 className={styles.heroHeadline}>Master <em>React & JavaScript</em> Concepts, One at a Time</h1>
                                 <p className={styles.heroDeck}>
-                                    A curated practice journal fetching React concepts directly from{" "}
+                                    A curated practice journal fetching React & JavaScript concepts directly from{" "}
                                     <a href="https://github.com/Richayadav75/react-wiki" target="_blank" rel="noopener noreferrer">
                                         github.com/Richayadav75/react-wiki
                                     </a>.

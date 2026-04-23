@@ -17,7 +17,7 @@ interface TopicPanelProps {
 }
 
 export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, onClose, error }: TopicPanelProps) {
-    const [activeTab, setActiveTab] = useState<'concept' | 'notes'>('concept');
+    const [activeTab, setActiveTab] = useState<'concept' | 'practice' | 'interview' | 'notes'>('concept');
 
     useEffect(() => {
         if (topic) {
@@ -65,6 +65,18 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                     Concept
                 </button>
                 <button
+                    className={`${styles.ptab} ${activeTab === 'practice' ? styles.ptabActive : ''}`}
+                    onClick={() => setActiveTab('practice')}
+                >
+                    Practice
+                </button>
+                <button
+                    className={`${styles.ptab} ${activeTab === 'interview' ? styles.ptabActive : ''}`}
+                    onClick={() => setActiveTab('interview')}
+                >
+                    Interview
+                </button>
+                <button
                     className={`${styles.ptab} ${activeTab === 'notes' ? styles.ptabActive : ''}`}
                     onClick={() => setActiveTab('notes')}
                 >
@@ -107,6 +119,32 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                                 >
                                     {topic.content || ''}
                                 </ReactMarkdown>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* PRACTICE TAB */}
+                {activeTab === 'practice' && (
+                    <div id="tab-practice">
+                        <span className={styles.colKicker}>Hands-on Coding</span>
+                        {topic.practiceCode ? (
+                            <CodeViewer code={topic.practiceCode} language="tsx" />
+                        ) : (
+                            <div className={styles.emptyState}>No practice code available yet.</div>
+                        )}
+                    </div>
+                )}
+
+                {/* INTERVIEW TAB */}
+                {activeTab === 'interview' && (
+                    <div id="tab-interview">
+                        <span className={styles.colKicker}>Interview Prep</span>
+                        <div className={styles.panelBodyText}>
+                            {topic.interviewQuestions ? (
+                                <ReactMarkdown>{topic.interviewQuestions}</ReactMarkdown>
+                            ) : (
+                                <div className={styles.emptyState}>No interview questions available yet.</div>
                             )}
                         </div>
                     </div>

@@ -8,6 +8,7 @@ import { useEffect, useState, Suspense } from "react";
 function NavbarContent() {
     const searchParams = useSearchParams();
     const currentTopic = searchParams.get("topic") || "All Concepts";
+    const currentTrack = searchParams.get("track") || "React";
     const [dateStr, setDateStr] = useState("");
 
     useEffect(() => {
@@ -19,7 +20,9 @@ function NavbarContent() {
         }) + ' · Vol. I, No. 1');
     }, []);
 
-    const navItems = ["All Concepts", "Hooks", "State Management", "Fundamentals", "Performance", "Patterns"];
+    const navItems = currentTrack === "React" 
+        ? ["All React", "State Management", "Fundamentals", "Performance", "Patterns"]
+        : ["All JavaScript", "JavaScript", "Core Concepts of JavaScript", "Interview Questions", "Practice"];
 
     return (
         <header className={styles.masthead}>
@@ -37,7 +40,7 @@ function NavbarContent() {
                 </Link>
 
                 <div className={styles.mascotWrap} title="React Logo">
-                    <svg width="60" height="60" viewBox="-11.5 -10.23174 23 20.46348" xmlns="http://www.w3.org/2000/svg" style={{marginTop: "8px", marginBottom: "8px"}}>
+                    <svg width="60" height="60" viewBox="-11.5 -10.23174 23 20.46348" xmlns="http://www.w3.org/2000/svg" style={{ marginTop: "8px", marginBottom: "8px" }}>
                         <circle cx="0" cy="0" r="2.05" fill="#149ECA" />
                         <g stroke="#149ECA" strokeWidth="1" fill="none">
                             <ellipse rx="11" ry="4.2" />
@@ -49,20 +52,40 @@ function NavbarContent() {
                 </div>
 
                 <div className={styles.mastheadRight}>
+                    <div className={styles.trackSwitcher}>
+                        <Link 
+                            href="/?track=React" 
+                            className={`${styles.trackBtn} ${currentTrack === "React" ? styles.trackBtnActive : ""}`}
+                        >
+                            React
+                        </Link>
+                        <Link 
+                            href="/?track=JavaScript" 
+                            className={`${styles.trackBtn} ${currentTrack === "JavaScript" ? styles.trackBtnActive : ""}`}
+                        >
+                            JavaScript
+                        </Link>
+                    </div>
                     <div className={styles.editionLine}>Daily Practice Edition</div>
                     <div className={styles.editionNum}>Est. 2024</div>
                 </div>
             </div>
             <div className={styles.navStrip}>
-                {navItems.map((item) => (
-                    <Link
-                        key={item}
-                        href={item === "All Concepts" ? "/" : `/?topic=${item}`}
-                        className={`${styles.navItem} ${currentTopic === item ? styles.navItemActive : ""}`}
-                    >
-                        {item}
-                    </Link>
-                ))}
+                {navItems.map((item) => {
+                    const isAll = item === "All React" || item === "All JavaScript";
+                    const href = isAll ? `/?track=${currentTrack}` : `/?track=${currentTrack}&topic=${item}`;
+                    const isActive = isAll ? (!searchParams.get("topic")) : currentTopic === item;
+                    
+                    return (
+                        <Link
+                            key={item}
+                            href={href}
+                            className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+                        >
+                            {item}
+                        </Link>
+                    );
+                })}
             </div>
         </header>
     );

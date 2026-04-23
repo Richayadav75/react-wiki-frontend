@@ -45,7 +45,45 @@
 
 .mastheadRight {
     text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
+
+.trackSwitcher {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.trackBtn {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--rule-light);
+    color: var(--ink3);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: var(--body);
+}
+
+.trackBtn:hover {
+    border-color: var(--ink2);
+    color: var(--ink2);
+}
+
+.trackBtnActive {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+}
+
+.trackBtnActive:hover {
+    color: var(--paper);
+}
+
 
 .editionLine {
     font-size: 11px;

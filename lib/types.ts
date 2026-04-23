@@ -8,4 +8,7 @@ export interface Topic {
 
 export interface TopicDetail extends Topic {
   content: string; // raw Markdown content from README.md
+  practiceCode?: string;
+  interviewQuestions?: string;
 }
+
