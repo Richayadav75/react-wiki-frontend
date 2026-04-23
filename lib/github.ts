@@ -30,6 +30,9 @@ export const MOCK_TOPICS: Topic[] = [
   { slug: 'this-keyword',       name: 'The "this" Keyword',  category: 'Core Concepts of JavaScript', difficulty: 'Intermediate', related: ['Call', 'Apply', 'Bind'] },
   { slug: 'promises',           name: 'Promises',            category: 'JavaScript',        difficulty: 'Intermediate', related: ['Async/Await', 'Callbacks'] },
   { slug: 'hoisting',           name: 'Hoisting',            category: 'Core Concepts of JavaScript', difficulty: 'Beginner',     related: ['Closures', 'Scope'] },
+  { slug: 'async-await',        name: 'Async/Await',         category: 'JavaScript',        difficulty: 'Intermediate', related: ['Promises', 'Event Loop'] },
+  { slug: 'es6-features',       name: 'ES6+ Features',       category: 'JavaScript',        difficulty: 'Beginner',     related: ['Arrow Functions', 'Destructuring'] },
+  { slug: 'array-methods',      name: 'Array Methods',       category: 'JavaScript',        difficulty: 'Beginner',     related: ['ES6 Features'] },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,6 +65,23 @@ function parseFrontMatter(content: string, slug: string): Topic {
     related: meta['related']?.split(',').map(s => s.trim()),
   };
 }
+
+function extractSection(content: string, sectionTitle: string): string | undefined {
+  const regex = new RegExp(`##\\s+${sectionTitle}\\s*\\n([\\s\\S]*?)(?=\\n##|$)`, 'i');
+  const match = content.match(regex);
+  if (!match) return undefined;
+  
+  let sectionContent = match[1].trim();
+  
+  // If it's the Practice section, try to extract just the code from a code block
+  if (sectionTitle.toLowerCase() === 'practice' || sectionTitle.toLowerCase() === 'example') {
+    const codeBlockMatch = sectionContent.match(/```(?:\w+)?\n([\s\S]*?)\n```/);
+    if (codeBlockMatch) return codeBlockMatch[1].trim();
+  }
+  
+  return sectionContent;
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FETCH TOPIC LIST
@@ -124,12 +144,16 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
     if (res.ok) {
       const content = await res.text();
       const meta = parseFrontMatter(content, slug);
-      // For demo purposes, we inject practice/interview if not present
+      
+      // Extract specific sections if they exist in the markdown
+      const interviewQuestions = extractSection(content, "Interview Questions");
+      const practiceCode = extractSection(content, "Practice") || extractSection(content, "Example");
+      
       return { 
         ...meta, 
         content,
-        practiceCode: `// Practice useState\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>Increment</button>\n    </div>\n  );\n}`,
-        interviewQuestions: `### 1. What does useState return?\nIt returns an array with two elements: the current state value and a function to update it.\n\n### 2. Can you use useState in class components?\nNo, useState is a hook for functional components. In class components, you use this.state and this.setState.`
+        practiceCode,
+        interviewQuestions
       };
     }
   } catch {
