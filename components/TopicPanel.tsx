@@ -127,11 +127,16 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                 {/* PRACTICE TAB */}
                 {activeTab === 'practice' && (
                     <div id="tab-practice">
-                        <span className={styles.colKicker}>Hands-on Coding</span>
+                        <div className={styles.practiceHeader}>
+                            <span className={styles.colKicker}>Hands-on Coding</span>
+                            <p className={styles.practiceSub}>Study this implementation to master the concept.</p>
+                        </div>
                         {topic.practiceCode ? (
-                            <CodeViewer code={topic.practiceCode} language="tsx" />
+                            <div className={styles.codeWorkspace}>
+                                <CodeViewer code={topic.practiceCode} language="tsx" />
+                            </div>
                         ) : (
-                            <div className={styles.emptyState}>No practice code available yet.</div>
+                            <div className={styles.emptyState}>No practice code available yet for this topic.</div>
                         )}
                     </div>
                 )}

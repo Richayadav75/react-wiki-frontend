@@ -10,8 +10,8 @@ import { Topic, TopicDetail } from "@/lib/types";
 
 function HomeContent({ initialTopics }: { initialTopics: Topic[] }) {
     const searchParams = useSearchParams();
-    const [topicFilter, setTopicFilter] = useState(searchParams.get("topic") || "All Concepts");
     const currentTrack = searchParams.get("track") || "React";
+    const [topicFilter, setTopicFilter] = useState(searchParams.get("topic") || (currentTrack === "React" ? "All React" : "All JavaScript"));
     const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
     const [selectedTopic, setSelectedTopic] = useState<TopicDetail | Topic | null>(null);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -23,8 +23,9 @@ function HomeContent({ initialTopics }: { initialTopics: Topic[] }) {
     }, [isPanelOpen]);
 
     useEffect(() => {
-        setTopicFilter(searchParams.get("topic") || "All Concepts");
-    }, [searchParams]);
+        const defaultTopic = currentTrack === "React" ? "All React" : "All JavaScript";
+        setTopicFilter(searchParams.get("topic") || defaultTopic);
+    }, [searchParams, currentTrack]);
 
     const toggleDiff = (diff: string) => {
         const next = new Set(hiddenDiffs);

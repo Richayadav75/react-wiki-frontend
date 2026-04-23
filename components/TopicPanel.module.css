@@ -186,6 +186,25 @@
     color: var(--ink3);
 }
 
+.practiceHeader {
+    margin-bottom: 24px;
+}
+
+.practiceSub {
+    font-size: 0.95rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+.codeWorkspace {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fdfdfd;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
 .colKicker {
     font-size: 10px;
     font-weight: 700;
