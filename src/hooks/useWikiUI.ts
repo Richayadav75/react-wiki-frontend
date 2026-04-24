@@ -4,8 +4,11 @@ import { Topic } from "@/lib/types";
 /**
  * Hook to manage the Wiki UI state (Panel, Focus Mode, Selection).
  */
-export function useWikiUI(markAsRead: (slug: string) => void) {
-    const [selectedTopic, setSelectedTopic] = useState<any>(null);
+export function useWikiUI(
+    markAsRead: (slug: string) => void,
+    selectedTopic: any,
+    setSelectedTopic: (topic: any) => void
+) {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -17,7 +20,7 @@ export function useWikiUI(markAsRead: (slug: string) => void) {
     /**
      * Handles selecting a topic from the list
      */
-    const handleSelect = (topic: Topic) => {
+    const handleSelect = (topic: any) => {
         setSelectedTopic(topic);
         setIsPanelOpen(true);
         markAsRead(topic.slug);

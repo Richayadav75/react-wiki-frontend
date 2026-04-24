@@ -16,16 +16,16 @@ export default function AppContent() {
   // Logic Hooks
   const {
     topics, filtered, isLoading, fetchError,
-    topicFilter, currentTrack, hiddenDiffs, toggleDiff
+    topicFilter, currentTrack, hiddenDiffs, toggleDiff,
+    selectedTopic, setSelectedTopic
   } = useWiki();
 
   const { solvedSlugs, markAsRead } = useProgress();
 
   // UI State Hook
   const {
-    selectedTopic, setSelectedTopic, isPanelOpen,
-    isExpanded, handleSelect, closePanel, toggleExpand
-  } = useWikiUI(markAsRead);
+    isPanelOpen, isExpanded, handleSelect, closePanel, toggleExpand
+  } = useWikiUI(markAsRead, selectedTopic, setSelectedTopic);
 
   // Derived Data
   const solvedCount = topics.filter(t => solvedSlugs.has(t.slug)).length;
