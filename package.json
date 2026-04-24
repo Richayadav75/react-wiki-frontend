@@ -2,28 +2,30 @@
   "name": "react-wiki-frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "next": "14.2.3",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
     "react-markdown": "^9.0.1",
     "lucide-react": "^0.378.0",
     "mermaid": "^11.14.0",
     "react-syntax-highlighter": "^15.5.0"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "sass": "^1.72.0",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.3"
+    "eslint": "^8.57.0"
   }
 }

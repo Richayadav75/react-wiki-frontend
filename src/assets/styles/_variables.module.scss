@@ -1,0 +1,40 @@
+// Colors
+$ink: #0f0e0c;
+$ink2: #3a3730;
+$ink3: #7a7570;
+$paper: #f5f0e8;
+$paper2: #ede8dc;
+$paper3: #e0d9cc;
+$rule: #1a1816;
+$rule-light: rgba(15, 14, 12, 0.12);
+$red: #8b1a1a;
+$red-bg: #f9f0f0;
+$gold: #b8860b;
+
+// Semantic
+$success-bg: #eaf3de;
+$success-text: #276749;
+$warning-bg: #fef3c7;
+$warning-text: #92400e;
+$danger-bg: #fee2e2;
+$danger-text: #991b1b;
+
+// Dimensions
+$header-height: 140px;
+$col-width: 680px;
+$panel-width: 50vw;
+
+// Fonts
+$serif: 'Playfair Display', 'Georgia', serif;
+$body-font: 'Libre Baskerville', 'Georgia', serif;
+$mono: 'Source Code Pro', monospace;
+$fraktur: 'UnifrakturMaguntia', cursive;
+
+// Export for TSX usage
+:export {
+  ink: $ink;
+  red: $red;
+  paper: $paper;
+  serif: $serif;
+  bodyFont: $body-font;
+}
