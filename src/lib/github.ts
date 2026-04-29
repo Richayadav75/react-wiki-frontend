@@ -3,12 +3,82 @@ import { Topic, TopicDetail } from './types';
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIGURATION
 // ─────────────────────────────────────────────────────────────────────────────
-const GITHUB_USER = 'Richayadav75';
-const GITHUB_REPO = 'react-wiki';
+const GITHUB_USER   = 'Richayadav75';
+const GITHUB_REPO   = 'react-wiki';
 const GITHUB_BRANCH = 'main';
 
 const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}`;
 const API_BASE = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CURRICULUM ORDER  (serial, line-by-line — not alphabetical)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Fundamentals / Basic Concepts — programming first principles */
+const FUNDAMENTALS_ORDER = [
+  'basic-programming',
+  'variables',
+  'data-types',
+  'operators',
+  'conditionals',
+  'loops',
+  'functions',
+  'arrays',
+  'objects',
+];
+
+/** React — component model → hooks → optimisation */
+const REACT_ORDER = [
+  'component-lifecycle',
+  'props-vs-state',
+  'useState',
+  'useEffect',
+  'useRef',
+  'useContext',
+  'useReducer',
+  'useMemo',
+  'useCallback',
+  'custom-hooks',
+  'react-memo',
+];
+
+/** JavaScript — core mechanics → OOP → async → browser */
+const JS_ORDER = [
+  'hoisting',
+  'scope',
+  'closures',
+  'this-keyword',
+  'es6-features',
+  'array-methods',
+  'string-methods',
+  'object-methods',
+  'math-methods',
+  'date-methods',
+  'classes-objects',
+  'prototypes',
+  'map-set',
+  'json',
+  'promises',
+  'async-await',
+  'event-loop',
+  'error-handling',
+  'dom',
+  'events',
+  'event-delegation',
+  'bom',
+  'regex',
+  'es-modules',
+];
+
+/** Returns the position of a slug in its track order (unknown → end) */
+function trackIndex(slug: string, category: string): number {
+  const order =
+    category === 'Fundamentals' ? FUNDAMENTALS_ORDER :
+    category === 'React'        ? REACT_ORDER        :
+                                  JS_ORDER;
+  const idx = order.indexOf(slug);
+  return idx === -1 ? 9999 : idx;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // UTILITIES
@@ -19,11 +89,11 @@ function parseFrontMatter(content: string, slug: string): Topic {
   const meta: Record<string, string> = {};
 
   for (const line of lines) {
-    // Flexible regex: handles optional dash, optional spaces, and case-insensitive keys
     const match = line.match(/^-?\s*(\w[\w\s]*):\s*(.+)$/i);
     if (match) {
       meta[match[1].trim().toLowerCase()] = match[2].trim();
     }
+    // Stop at first heading so we don't parse content as metadata
     if (line.startsWith('#') && Object.keys(meta).length > 0) break;
   }
 
@@ -34,154 +104,155 @@ function parseFrontMatter(content: string, slug: string): Topic {
 
   return {
     slug,
-    name: meta['name'] ?? name,
-    category: meta['category'] ?? 'General',
-    track: meta['track'],
+    name:       meta['name']       ?? name,
+    category:   meta['category']   ?? 'General',
+    track:      meta['track'],
     difficulty: (meta['difficulty'] as Topic['difficulty']) ?? 'Beginner',
-    related: meta['related']?.split(',').map(s => s.trim()),
+    related:    meta['related']?.split(',').map(s => s.trim()),
   };
 }
 
 function extractSection(content: string, sectionTitle: string): string | undefined {
-  // More robust regex: 
-  // 1. Supports ## or ###
-  // 2. Supports optional numbering (e.g., "1. ")
-  // 3. Supports optional colon (e.g., "Example:")
-  // 4. Case-insensitive
-  const regex = new RegExp(`#{2,3}\\s+(?:\\d+\\.\\s+)?${sectionTitle}\\s*:?\\s*\\n([\\s\\S]*?)(?=\\n#{2,3}|$)`, 'i');
+  const regex = new RegExp(
+    `#{2,3}\\s+(?:\\d+\\.\\s+)?${sectionTitle}\\s*:?\\s*\\n([\\s\\S]*?)(?=\\n#{2,3}|$)`,
+    'i'
+  );
   const match = content.match(regex);
   if (!match) return undefined;
 
-  let sectionContent = match[1].trim();
-  if (sectionTitle.toLowerCase() === 'practice' || sectionTitle.toLowerCase() === 'example') {
-    const codeBlockMatch = sectionContent.match(/```(?:\w+)?\n([\s\S]*?)\n```/);
-    if (codeBlockMatch) return codeBlockMatch[1].trim();
+  const sectionContent = match[1].trim();
+  if (['practice', 'example'].includes(sectionTitle.toLowerCase())) {
+    const codeMatch = sectionContent.match(/```(?:\w+)?\n([\s\S]*?)\n```/);
+    if (codeMatch) return codeMatch[1].trim();
   }
   return sectionContent;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NORMALISATION HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Slugs that belong to Fundamentals regardless of README metadata */
+const FUNDAMENTALS_SLUGS = new Set([
+  'basic-programming', 'variables', 'data-types', 'operators',
+  'conditionals', 'loops', 'functions', 'arrays', 'objects',
+]);
+
+/** Slugs that belong to React regardless of README metadata */
+const REACT_SLUGS = new Set([
+  'component-lifecycle', 'props-vs-state',
+  'useState', 'useEffect', 'useRef', 'useContext', 'useReducer',
+  'useMemo', 'useCallback', 'custom-hooks', 'react-memo',
+]);
+
+/**
+ * Maps a topic to one of the three canonical categories:
+ *   "Fundamentals" | "React" | "JavaScript"
+ *
+ * Priority:
+ *   1. Slug-based lookup (guaranteed correct)
+ *   2. `track` field from README  (author-declared)
+ *   3. Default → "JavaScript"
+ */
+function resolveCategory(t: Topic): 'Fundamentals' | 'React' | 'JavaScript' {
+  const slug  = t.slug.toLowerCase();
+  const track = (t.track ?? '').toLowerCase().trim();
+
+  // 1. Slug-based — absolute override
+  if (FUNDAMENTALS_SLUGS.has(slug)) return 'Fundamentals';
+  if (REACT_SLUGS.has(slug))        return 'React';
+
+  // 2. Track field from README
+  if (track === 'fundamentals' || track === 'basic concepts') return 'Fundamentals';
+  if (track === 'react')                                       return 'React';
+  if (track === 'javascript')                                  return 'JavaScript';
+
+  // 3. Default
+  return 'JavaScript';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // API METHODS
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Fetches the list of all topics by scanning the repository folders.
- */
+/** Fetches every folder in the repo and returns a minimal Topic for each. */
 export async function fetchTopicList(): Promise<Topic[]> {
   try {
     const res = await fetch(API_BASE, {
       headers: { Accept: 'application/vnd.github+json' },
     });
-
-    if (!res.ok) throw new Error(`GitHub API responded ${res.status}`);
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
 
     const items: Array<{ name: string; type: string }> = await res.json();
     const folders = items.filter(i => i.type === 'dir' && !i.name.startsWith('.'));
 
-    const topics = await Promise.all(
+    return Promise.all(
       folders.map(async (folder): Promise<Topic> => {
         try {
-          const readmeRes = await fetch(`${RAW_BASE}/${folder.name}/README.md`);
-          if (!readmeRes.ok) throw new Error('no readme');
-          const content = await readmeRes.text();
-          return parseFrontMatter(content, folder.name);
+          const r = await fetch(`${RAW_BASE}/${folder.name}/README.md`);
+          if (!r.ok) throw new Error('no readme');
+          return parseFrontMatter(await r.text(), folder.name);
         } catch {
           return parseFrontMatter('', folder.name);
         }
       })
     );
-
-    return topics;
-  } catch (err) {
+  } catch {
     return [];
   }
 }
 
-/**
- * Fetches the full content of a specific topic from its README.md file.
- */
+/** Fetches the full Markdown content + extracted sections for one topic. */
 export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null> {
   try {
-    const readmeRes = await fetch(`${RAW_BASE}/${slug}/README.md`);
-    if (readmeRes.ok) {
-      const content = await readmeRes.text();
-      const meta = parseFrontMatter(content, slug);
-      
-      // Attempt to fetch interview.md if it exists
-      let interviewContent: string | undefined;
-      try {
-        const interviewRes = await fetch(`${RAW_BASE}/${slug}/interview.md`);
-        if (interviewRes.ok) {
-          interviewContent = await interviewRes.text();
-        }
-      } catch {}
+    const r = await fetch(`${RAW_BASE}/${slug}/README.md`);
+    if (!r.ok) return null;
 
-      return {
-        ...meta,
-        content,
-        interviewContent,
-        practiceCode: extractSection(content, "Practice") || extractSection(content, "Example"),
-        interviewQuestions: extractSection(content, "Interview Questions")
-      };
-    }
-  } catch {}
+    const content = await r.text();
+    const meta    = parseFrontMatter(content, slug);
 
-  return null;
+    let interviewContent: string | undefined;
+    try {
+      const ir = await fetch(`${RAW_BASE}/${slug}/interview.md`);
+      if (ir.ok) interviewContent = await ir.text();
+    } catch { /* interview.md is optional */ }
+
+    return {
+      ...meta,
+      content,
+      interviewContent,
+      practiceCode:       extractSection(content, 'Practice') || extractSection(content, 'Example'),
+      interviewQuestions: extractSection(content, 'Interview Questions'),
+    };
+  } catch {
+    return null;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DATA PROCESSING (Normalization & Sorting)
+// PROCESSED TOPIC LIST  (normalised + sorted)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FUNDAMENTALS_CATS = ["Programming Basics", "Fundamentals", "Basic", "Basic Fundamentals"];
-const REACT_CATS = ["Hooks", "State Management", "Performance", "Patterns", "React", "React Fundamentals"];
-
-const FOUNDATIONAL_SLUGS = [
-  'intro-programming', 'variables', 'operators', 'data-types',
-  'conditionals', 'loops', 'functions', 'arrays', 'objects'
-];
-
-const JS_ORDER = [
-  'closures', 'hoisting', 'scope', 'this-keyword', 'event-loop',
-  'promises', 'async-await', 'es6-features', 'array-methods',
-  'string-methods', 'object-methods', 'math-methods', 'date-methods',
-  'classes-objects', 'prototypes', 'map-set', 'json', 'dom', 'bom',
-  'events', 'error-handling', 'regex'
-];
-
 /**
- * Normalizes a list of topics into the 3 primary categories and sorts them.
+ * Returns all topics normalised into exactly three categories
+ * and sorted in curriculum / serial order (not alphabetically).
  */
 export async function getProcessedTopics(): Promise<Topic[]> {
   const list = await fetchTopicList();
 
-  // 1. Normalize categories
-  const normalized = list.map(t => {
-    const cat = t.category;
-    const track = t.track?.toLowerCase();
-    const slug = t.slug.toLowerCase();
+  // 1. Normalise category to one of the three canonical values
+  const normalised = list.map(t => ({
+    ...t,
+    category: resolveCategory(t),
+  }));
 
-    let finalCategory = "JavaScript"; // Default
-
-    const isReact = slug.includes('react') || slug.includes('hook') || slug === 'component-lifecycle' || slug === 'props-vs-state';
-
-    if (!isReact && (FOUNDATIONAL_SLUGS.includes(slug) || track === "fundamentals" || track === "basic" || track === "programming" || FUNDAMENTALS_CATS.some(c => cat.includes(c)))) {
-      finalCategory = "Basic Concepts";
-    } else if (isReact || track === "react" || REACT_CATS.some(c => cat.includes(c))) {
-      finalCategory = "React";
+  // 2. Sort by curriculum position within each category, unknowns go last
+  return normalised.sort((a, b) => {
+    // Keep topics within the same category grouped
+    if (a.category !== b.category) {
+      const catOrder = ['Fundamentals', 'React', 'JavaScript'];
+      return catOrder.indexOf(a.category) - catOrder.indexOf(b.category);
     }
-
-    return { ...t, category: finalCategory };
-  });
-
-  // 2. Sort based on custom curriculum order
-  return normalized.sort((a, b) => {
-    const indexA = JS_ORDER.indexOf(a.slug);
-    const indexB = JS_ORDER.indexOf(b.slug);
-
-    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-    if (indexA !== -1) return -1;
-    if (indexB !== -1) return 1;
-    return a.name.localeCompare(b.name);
+    return trackIndex(a.slug, a.category) - trackIndex(b.slug, b.category);
   });
 }

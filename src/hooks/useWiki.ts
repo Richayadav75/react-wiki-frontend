@@ -39,16 +39,17 @@ export function useWiki() {
         load();
     }, []);
 
-    // Sync sub-filter with track
+    // Sync sub-filter label with current track
     useEffect(() => {
-        const defaultFilter = currentTrack === "Fundamentals" 
-            ? "All Basic Concepts" 
-            : (currentTrack === "React" ? "All React" : "All JavaScript");
-            
+        const defaultFilter =
+            currentTrack === "Fundamentals" ? "All Fundamentals" :
+            currentTrack === "React"        ? "All React"        :
+                                              "All JavaScript";
+
         setTopicFilter(searchParams.get("topic") || defaultFilter);
     }, [searchParams, currentTrack]);
 
-    // Fetch full detail when selected
+    // Fetch full detail when a topic is selected
     useEffect(() => {
         if (selectedTopic && !('content' in selectedTopic)) {
             const loadDetails = async () => {
@@ -64,20 +65,20 @@ export function useWiki() {
     // --- COMPUTED ---
 
     const filtered = useMemo(() => {
-        // 1. Filter by Track
+        // 1. Filter by Track — category names are now canonical
         const byTrack = topics.filter(t => {
-            if (currentTrack === "Fundamentals") return t.category === "Basic Concepts";
-            if (currentTrack === "React") return t.category === "React";
+            if (currentTrack === "Fundamentals") return t.category === "Fundamentals";
+            if (currentTrack === "React")        return t.category === "React";
             return t.category === "JavaScript";
         });
 
-        // 2. Filter by Topic/Category
+        // 2. All-filter shortcut (shows everything in that track)
         const isAll = topicFilter.startsWith("All ");
-        const byTopic = isAll 
-            ? byTrack 
+        const byTopic = isAll
+            ? byTrack
             : byTrack.filter(t => t.category.toLowerCase() === topicFilter.toLowerCase());
 
-        // 3. Filter by Difficulty
+        // 3. Difficulty toggle
         return byTopic.filter(t => !hiddenDiffs.has(t.difficulty));
     }, [topics, currentTrack, topicFilter, hiddenDiffs]);
 
