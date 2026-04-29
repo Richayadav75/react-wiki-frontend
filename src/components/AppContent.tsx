@@ -20,7 +20,7 @@ export default function AppContent() {
     selectedTopic, setSelectedTopic
   } = useWiki();
 
-  const { solvedSlugs, markAsRead } = useProgress();
+  const { solvedSlugs, markAsRead, toggleRead } = useProgress();
 
   // UI State Hook
   const {
@@ -117,7 +117,12 @@ export default function AppContent() {
                         topic={topic}
                         index={i}
                         isSelected={selectedTopic?.slug === topic.slug}
+                        isRead={solvedSlugs.has(topic.slug)}
                         onSelect={() => handleSelect(topic)}
+                        onToggleRead={(e) => {
+                          e.stopPropagation();
+                          toggleRead(topic.slug);
+                        }}
                       />
                     ))
                   )}

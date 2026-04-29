@@ -138,13 +138,9 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                             <span className={styles.colKicker}>Hands-on Coding</span>
                             <p className={styles.practiceSub}>Study this implementation to master the concept.</p>
                         </div>
-                        {topic.practiceCode ? (
-                            <div className={styles.codeWorkspace}>
-                                <PracticeEditor initialCode={topic.practiceCode} language="tsx" />
-                            </div>
-                        ) : (
-                            <div className={styles.emptyState}>No practice code available yet for this topic.</div>
-                        )}
+                        <div className={styles.codeWorkspace}>
+                            <PracticeEditor initialCode={topic.practiceCode || "// Write your practice code here...\n"} language="tsx" />
+                        </div>
                     </div>
                 )}
 
@@ -164,13 +160,60 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
 
                 {/* NOTES TAB */}
                 {activeTab === 'notes' && (
-                    <div id="tab-notes">
-                        <span className={styles.colKicker} style={{ marginTop: 0 }}>Your notes</span>
-                        <textarea className={styles.notesArea} placeholder="Your mental model, gotchas, code snippets..."></textarea>
-                        <button className={styles.notesSave}>Save</button>
-                    </div>
+                    <NotesTab slug={topic.slug} />
                 )}
             </div>
         </aside>
+    );
+}
+
+function NotesTab({ slug }: { slug: string }) {
+    const [note, setNote] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        const savedNotes = localStorage.getItem(`wiki_notes_${slug}`);
+        if (savedNotes) {
+            setNote(savedNotes);
+        } else {
+            setNote("");
+            setIsEditing(true); // Open edit mode by default if no note
+        }
+    }, [slug]);
+
+    const handleSave = () => {
+        localStorage.setItem(`wiki_notes_${slug}`, note);
+        setIsEditing(false);
+    };
+
+    return (
+        <div id="tab-notes">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <span className={styles.colKicker} style={{ margin: 0 }}>Your notes (Supports Markdown)</span>
+                {note && !isEditing && (
+                    <button className={styles.notesSave} onClick={() => setIsEditing(true)}>Edit</button>
+                )}
+            </div>
+            
+            {isEditing ? (
+                <>
+                    <textarea 
+                        className={styles.notesArea} 
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        placeholder="Your mental model, gotchas, code snippets... You can also add images using Markdown: ![alt text](image_url)"
+                    ></textarea>
+                    <button className={styles.notesSave} onClick={handleSave}>Save Notes</button>
+                </>
+            ) : (
+                <div className={styles.panelBodyText} style={{ minHeight: '200px', border: '1px solid var(--rule-light)', padding: '16px', borderRadius: '4px' }}>
+                    {note ? (
+                        <ReactMarkdown>{note}</ReactMarkdown>
+                    ) : (
+                        <span style={{ color: 'var(--ink3)', fontStyle: 'italic' }}>No notes yet. Click Edit to add some.</span>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }

@@ -27,17 +27,17 @@ const FUNDAMENTALS_ORDER = [
   'objects',
 ];
 
-/** React — component model → hooks → optimisation */
+/** React — component model → hooks → optimisation (all lowercase slugs) */
 const REACT_ORDER = [
   'component-lifecycle',
   'props-vs-state',
-  'useState',
-  'useEffect',
-  'useRef',
-  'useContext',
-  'useReducer',
-  'useMemo',
-  'useCallback',
+  'usestate',
+  'useeffect',
+  'useref',
+  'usecontext',
+  'usereducer',
+  'usememo',
+  'usecallback',
   'custom-hooks',
   'react-memo',
 ];
@@ -138,11 +138,11 @@ const FUNDAMENTALS_SLUGS = new Set([
   'conditionals', 'loops', 'functions', 'arrays', 'objects',
 ]);
 
-/** Slugs that belong to React regardless of README metadata */
+/** Slugs that belong to React regardless of README metadata (all lowercase) */
 const REACT_SLUGS = new Set([
   'component-lifecycle', 'props-vs-state',
-  'useState', 'useEffect', 'useRef', 'useContext', 'useReducer',
-  'useMemo', 'useCallback', 'custom-hooks', 'react-memo',
+  'usestate', 'useeffect', 'useref', 'usecontext', 'usereducer',
+  'usememo', 'usecallback', 'custom-hooks', 'react-memo',
 ]);
 
 /**
@@ -208,8 +208,16 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
     const r = await fetch(`${RAW_BASE}/${slug}/README.md`);
     if (!r.ok) return null;
 
-    const content = await r.text();
-    const meta    = parseFrontMatter(content, slug);
+    const raw = await r.text();
+
+    // Rewrite relative image paths → absolute raw GitHub URLs
+    // e.g. ![Concept](concept.png) → ![Concept](https://raw.githubusercontent.com/.../slug/concept.png)
+    const content = raw.replace(
+      /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
+      (_, alt, src) => `![${alt}](${RAW_BASE}/${slug}/${src.replace(/^\.\//, '')})`
+    );
+
+    const meta = parseFrontMatter(content, slug);
 
     let interviewContent: string | undefined;
     try {

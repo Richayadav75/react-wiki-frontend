@@ -19,15 +19,26 @@ export function useProgress() {
         }
     }, []);
 
-    // Mark a topic as read
-    const markAsRead = (slug: string) => {
+    // Toggle a topic read status
+    const toggleRead = (slug: string) => {
+        setSolvedSlugs(prev => {
+            const next = new Set(prev);
+            if (next.has(slug)) {
+                next.delete(slug);
+            } else {
+                next.add(slug);
+            }
+            localStorage.setItem("wiki_progress", JSON.stringify(Array.from(next)));
+            return next;
+        });
+    };
+
+    return { solvedSlugs, toggleRead, markAsRead: (slug: string) => {
         setSolvedSlugs(prev => {
             const next = new Set(prev);
             next.add(slug);
             localStorage.setItem("wiki_progress", JSON.stringify(Array.from(next)));
             return next;
         });
-    };
-
-    return { solvedSlugs, markAsRead };
+    } };
 }
