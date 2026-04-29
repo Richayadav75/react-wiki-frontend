@@ -121,6 +121,23 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                                                 return <CodeViewer code={String(children).replace(/\n$/, '')} language={match[1]} />;
                                             }
                                             return <code className={className} {...props}>{children}</code>;
+                                        },
+                                        a({ node, href, children, ...props }) {
+                                            if (href && (href === './interview.md' || href.endsWith('interview.md'))) {
+                                                return (
+                                                    <a 
+                                                        href="#" 
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setActiveTab('interview');
+                                                        }}
+                                                        {...props}
+                                                    >
+                                                        {children}
+                                                    </a>
+                                                );
+                                            }
+                                            return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>;
                                         }
                                     }}
                                 >

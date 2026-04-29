@@ -22,7 +22,7 @@ export function useWiki() {
     const [fetchError, setFetchError] = useState<string | null>(null);
 
     // Derived State
-    const currentTrack = searchParams.get("track") || "React";
+    const currentTrack = searchParams.get("track") || "Fundamentals";
 
     // --- EFFECTS ---
 

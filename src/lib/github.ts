@@ -219,6 +219,22 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
 
     const meta = parseFrontMatter(content, slug);
 
+    // Strip metadata from the top of content so it doesn't render in the UI
+    const lines = content.split('\n');
+    const cleanLines = [];
+    let inMeta = true;
+    for (const line of lines) {
+      if (inMeta) {
+        // Skip lines that are metadata or empty lines between/before metadata
+        if (line.match(/^-?\s*(\w[\w\s]*):\s*(.+)$/i) || line.trim() === '') {
+          continue;
+        }
+        inMeta = false; // Stop stripping once we hit real content (headings, text, etc)
+      }
+      cleanLines.push(line);
+    }
+    const cleanContent = cleanLines.join('\n');
+
     let interviewContent: string | undefined;
     try {
       const ir = await fetch(`${RAW_BASE}/${slug}/interview.md`);
@@ -227,10 +243,10 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
 
     return {
       ...meta,
-      content,
+      content: cleanContent,
       interviewContent,
-      practiceCode:       extractSection(content, 'Practice') || extractSection(content, 'Example'),
-      interviewQuestions: extractSection(content, 'Interview Questions'),
+      practiceCode:       extractSection(cleanContent, 'Practice') || extractSection(cleanContent, 'Example'),
+      interviewQuestions: extractSection(cleanContent, 'Interview Questions'),
     };
   } catch {
     return null;

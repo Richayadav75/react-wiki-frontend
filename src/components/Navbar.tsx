@@ -29,8 +29,8 @@ export default function Navbar() {
                 </span>
             </div>
             <div className={styles.mastheadMain}>
-                <Link to="/" className={styles.nameplate}>
-                    <img src={IMAGES.LOGO} alt="The Code Times" className={styles.logoImg} />
+                <Link to="/" className={styles.nameplate} style={{ textDecoration: 'none' }}>
+                    The Code Times
                 </Link>
 
 
@@ -47,16 +47,16 @@ export default function Navbar() {
                     Basic Concepts
                 </Link>
                 <Link 
-                    to="/?track=React" 
-                    className={`${styles.navItem} ${currentTrack === "React" ? styles.navItemActive : ""}`}
-                >
-                    React
-                </Link>
-                <Link 
                     to="/?track=JavaScript" 
                     className={`${styles.navItem} ${currentTrack === "JavaScript" ? styles.navItemActive : ""}`}
                 >
                     JavaScript
+                </Link>
+                <Link 
+                    to="/?track=React" 
+                    className={`${styles.navItem} ${currentTrack === "React" ? styles.navItemActive : ""}`}
+                >
+                    React
                 </Link>
             </div>
         </header>
