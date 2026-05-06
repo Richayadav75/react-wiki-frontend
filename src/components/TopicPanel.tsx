@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { TopicDetail } from "@/lib/types";
 import CodeViewer from "@/components/CodeViewer";
+import OutputBlock from "@/components/OutputBlock";
+import FlowChart from "@/components/FlowChart";
 import PracticeEditor from "@/components/PracticeEditor";
 import ReactMarkdown from "react-markdown";
 import { Maximize2, Minimize2, X } from "lucide-react";
@@ -15,8 +17,10 @@ interface TopicPanelProps {
     error?: string | null;
 }
 
+type ActiveTab = 'concept' | 'practice' | 'interview' | 'flow' | 'notes';
+
 export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, onClose, error }: TopicPanelProps) {
-    const [activeTab, setActiveTab] = useState<'concept' | 'practice' | 'interview' | 'notes'>('concept');
+    const [activeTab, setActiveTab] = useState<ActiveTab>('concept');
 
     useEffect(() => {
         if (topic) {
@@ -36,6 +40,14 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
 
     const isSkeletal = !('content' in topic) || !topic.content;
     const diffClass = topic.difficulty?.toLowerCase() || 'medium';
+
+    const tabs: { id: ActiveTab; label: string }[] = [
+        { id: 'concept', label: 'Concept' },
+        { id: 'practice', label: 'Practice' },
+        { id: 'interview', label: 'Interview' },
+        { id: 'flow', label: 'Flow' },
+        { id: 'notes', label: 'Notes' },
+    ];
 
     return (
         <aside className={`${styles.panel} ${isOpen ? styles.open : ''} ${isExpanded ? styles.expanded : ''}`}>
@@ -64,34 +76,21 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                 </div>
             </div>
 
+            {/* TABS */}
             <div className={styles.panelTabs}>
-                <button
-                    className={`${styles.ptab} ${activeTab === 'concept' ? styles.ptabActive : ''}`}
-                    onClick={() => setActiveTab('concept')}
-                >
-                    Concept
-                </button>
-                <button
-                    className={`${styles.ptab} ${activeTab === 'practice' ? styles.ptabActive : ''}`}
-                    onClick={() => setActiveTab('practice')}
-                >
-                    Practice
-                </button>
-                <button
-                    className={`${styles.ptab} ${activeTab === 'interview' ? styles.ptabActive : ''}`}
-                    onClick={() => setActiveTab('interview')}
-                >
-                    Interview
-                </button>
-                <button
-                    className={`${styles.ptab} ${activeTab === 'notes' ? styles.ptabActive : ''}`}
-                    onClick={() => setActiveTab('notes')}
-                >
-                    Notes
-                </button>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        className={`${styles.ptab} ${activeTab === tab.id ? styles.ptabActive : ''}`}
+                        onClick={() => setActiveTab(tab.id)}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
 
             <div className={styles.panelBody}>
+
                 {/* CONCEPT TAB */}
                 {activeTab === 'concept' && (
                     <div id="tab-concept">
@@ -104,9 +103,7 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                         <span className={styles.colKicker}>Explanation</span>
                         <div className={styles.panelBodyText}>
                             {error ? (
-                                <div className={styles.errorState}>
-                                    ✕ {error}
-                                </div>
+                                <div className={styles.errorState}>✕ {error}</div>
                             ) : isSkeletal ? (
                                 <div className={styles.loadingState}>
                                     <span className={styles.spinner}></span> Consulting GitHub...
@@ -116,23 +113,19 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                                     components={{
                                         code({ node, className, children, ...props }) {
                                             const match = /language-(\w+)/.exec(className || '');
-                                            // Handle react-syntax-highlighter
                                             if (match) {
                                                 return <CodeViewer code={String(children).replace(/\n$/, '')} language={match[1]} />;
+                                            }
+                                            const isBlock = String(children).includes('\n');
+                                            if (isBlock) {
+                                                return <OutputBlock text={String(children).replace(/\n$/, '')} />;
                                             }
                                             return <code className={className} {...props}>{children}</code>;
                                         },
                                         a({ node, href, children, ...props }) {
                                             if (href && (href === './interview.md' || href.endsWith('interview.md'))) {
                                                 return (
-                                                    <a 
-                                                        href="#" 
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            setActiveTab('interview');
-                                                        }}
-                                                        {...props}
-                                                    >
+                                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('interview'); }} {...props}>
                                                         {children}
                                                     </a>
                                                 );
@@ -175,6 +168,20 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                     </div>
                 )}
 
+                {/* FLOW TAB */}
+                {activeTab === 'flow' && (
+                    <div id="tab-flow">
+                        <span className={styles.colKicker}>Flow Diagram</span>
+                        {isSkeletal ? (
+                            <div className={styles.loadingState}>
+                                <span className={styles.spinner}></span> Loading flow data...
+                            </div>
+                        ) : (
+                            <FlowChart content={topic.content || ''} />
+                        )}
+                    </div>
+                )}
+
                 {/* NOTES TAB */}
                 {activeTab === 'notes' && (
                     <NotesTab slug={topic.slug} />
@@ -194,7 +201,7 @@ function NotesTab({ slug }: { slug: string }) {
             setNote(savedNotes);
         } else {
             setNote("");
-            setIsEditing(true); // Open edit mode by default if no note
+            setIsEditing(true);
         }
     }, [slug]);
 
@@ -206,26 +213,47 @@ function NotesTab({ slug }: { slug: string }) {
     return (
         <div id="tab-notes">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <span className={styles.colKicker} style={{ margin: 0 }}>Your notes (Supports Markdown)</span>
+                <span className={styles.colKicker} style={{ margin: 0 }}>Your notes (Supports Markdown + Images)</span>
                 {note && !isEditing && (
                     <button className={styles.notesSave} onClick={() => setIsEditing(true)}>Edit</button>
                 )}
             </div>
-            
+
             {isEditing ? (
                 <>
-                    <textarea 
-                        className={styles.notesArea} 
+                    <textarea
+                        className={styles.notesArea}
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
-                        placeholder="Your mental model, gotchas, code snippets... You can also add images using Markdown: ![alt text](image_url)"
+                        placeholder={"Your mental model, gotchas, code snippets...\n\nInsert images with: ![alt text](https://image-url.png)"}
                     ></textarea>
                     <button className={styles.notesSave} onClick={handleSave}>Save Notes</button>
                 </>
             ) : (
                 <div className={styles.panelBodyText} style={{ minHeight: '200px', border: '1px solid var(--rule-light)', padding: '16px', borderRadius: '4px' }}>
                     {note ? (
-                        <ReactMarkdown>{note}</ReactMarkdown>
+                        <ReactMarkdown
+                            components={{
+                                img({ src, alt, ...props }) {
+                                    return (
+                                        <img
+                                            src={src}
+                                            alt={alt || ''}
+                                            {...props}
+                                            style={{
+                                                maxWidth: '100%',
+                                                borderRadius: '6px',
+                                                margin: '12px 0',
+                                                display: 'block',
+                                                border: '1px solid var(--rule-light)',
+                                            }}
+                                        />
+                                    );
+                                },
+                            }}
+                        >
+                            {note}
+                        </ReactMarkdown>
                     ) : (
                         <span style={{ color: 'var(--ink3)', fontStyle: 'italic' }}>No notes yet. Click Edit to add some.</span>
                     )}

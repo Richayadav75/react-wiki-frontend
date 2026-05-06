@@ -1,0 +1,52 @@
+.outputWrapper {
+    margin: 4px 0 24px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+    background: #1e1e2e;
+    font-family: var(--mono);
+}
+
+.outputLabel {
+    display: block;
+    background: #2a2a3d;
+    color: #a5b4fc;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-bottom: 1px solid #3a3a55;
+    font-family: var(--body);
+}
+
+.outputBody {
+    padding: 10px 0;
+}
+
+.outputLine {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 3px 14px;
+    line-height: 1.7;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.04);
+    }
+}
+
+.lineIndex {
+    font-size: 10px;
+    color: #4a4a6a;
+    min-width: 14px;
+    text-align: right;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.lineValue {
+    font-size: 13.5px;
+    color: #cdd6f4;
+    letter-spacing: 0.01em;
+}
