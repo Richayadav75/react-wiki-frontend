@@ -25,6 +25,7 @@ const FUNDAMENTALS_ORDER = [
   'functions',
   'arrays',
   'objects',
+  'type corecion',
 ];
 
 /** React — component model → hooks → optimisation (all lowercase slugs) */
@@ -44,8 +45,7 @@ const REACT_ORDER = [
 
 /** JavaScript — core mechanics → OOP → async → browser */
 const JS_ORDER = [
-  'hoisting',
-  'scope',
+  'hoisting & scope',
   'closures',
   'this-keyword',
   'es6-features',
@@ -189,7 +189,7 @@ export async function fetchTopicList(): Promise<Topic[]> {
     return Promise.all(
       folders.map(async (folder): Promise<Topic> => {
         try {
-          const r = await fetch(`${RAW_BASE}/${folder.name}/README.md`);
+          const r = await fetch(`${RAW_BASE}/${encodeURIComponent(folder.name)}/README.md`);
           if (!r.ok) throw new Error('no readme');
           return parseFrontMatter(await r.text(), folder.name);
         } catch {
@@ -205,7 +205,7 @@ export async function fetchTopicList(): Promise<Topic[]> {
 /** Fetches the full Markdown content + extracted sections for one topic. */
 export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null> {
   try {
-    const r = await fetch(`${RAW_BASE}/${slug}/README.md`);
+    const r = await fetch(`${RAW_BASE}/${encodeURIComponent(slug)}/README.md`);
     if (!r.ok) return null;
 
     const raw = await r.text();
@@ -214,7 +214,12 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
     // e.g. ![Concept](concept.png) → ![Concept](https://raw.githubusercontent.com/.../slug/concept.png)
     const content = raw.replace(
       /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
-      (_, alt, src) => `![${alt}](${RAW_BASE}/${slug}/${src.replace(/^\.\//, '')})`
+      (_, alt, src) => {
+        const encodedSlug = encodeURIComponent(slug);
+        const cleanSrc = src.replace(/^\.\//, '');
+        const encodedSrc = cleanSrc.split('/').map(encodeURIComponent).join('/');
+        return `![${alt}](${RAW_BASE}/${encodedSlug}/${encodedSrc})`;
+      }
     );
 
     const meta = parseFrontMatter(content, slug);
@@ -237,7 +242,7 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
 
     let interviewContent: string | undefined;
     try {
-      const ir = await fetch(`${RAW_BASE}/${slug}/interview.md`);
+      const ir = await fetch(`${RAW_BASE}/${encodeURIComponent(slug)}/interview.md`);
       if (ir.ok) interviewContent = await ir.text();
     } catch { /* interview.md is optional */ }
 
