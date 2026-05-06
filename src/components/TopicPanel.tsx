@@ -177,21 +177,26 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                                 <span className={styles.spinner}></span> Loading flow data...
                             </div>
                         ) : (
-                            <FlowChart content={topic.content || ''} />
+                            <div className={styles.panelBodyText}>
+                                {topic.flowContent && (
+                                    <ReactMarkdown>{topic.flowContent}</ReactMarkdown>
+                                )}
+                                <FlowChart content={topic.flowContent || topic.content || ''} />
+                            </div>
                         )}
                     </div>
                 )}
 
                 {/* NOTES TAB */}
                 {activeTab === 'notes' && (
-                    <NotesTab slug={topic.slug} />
+                    <NotesTab slug={topic.slug} repoNote={topic.noteContent} />
                 )}
             </div>
         </aside>
     );
 }
 
-function NotesTab({ slug }: { slug: string }) {
+function NotesTab({ slug, repoNote }: { slug: string; repoNote?: string }) {
     const [note, setNote] = useState("");
     const [isEditing, setIsEditing] = useState(false);
 
@@ -201,9 +206,9 @@ function NotesTab({ slug }: { slug: string }) {
             setNote(savedNotes);
         } else {
             setNote("");
-            setIsEditing(true);
+            if (!repoNote) setIsEditing(true);
         }
-    }, [slug]);
+    }, [slug, repoNote]);
 
     const handleSave = () => {
         localStorage.setItem(`wiki_notes_${slug}`, note);
@@ -230,7 +235,34 @@ function NotesTab({ slug }: { slug: string }) {
                     <button className={styles.notesSave} onClick={handleSave}>Save Notes</button>
                 </>
             ) : (
-                <div className={styles.panelBodyText} style={{ minHeight: '200px', border: '1px solid var(--rule-light)', padding: '16px', borderRadius: '4px' }}>
+                <div className={styles.notesViewContainer}>
+                    {repoNote && (
+                        <div className={styles.repoNote} style={{ marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px dashed var(--rule-light)' }}>
+                            <span className={styles.colKicker} style={{ fontSize: '10px', opacity: 0.7 }}>Pinned from Repository</span>
+                            <ReactMarkdown
+                                components={{
+                                    img({ src, alt, ...props }) {
+                                        return (
+                                            <img
+                                                src={src}
+                                                alt={alt || ''}
+                                                {...props}
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    borderRadius: '6px',
+                                                    margin: '12px 0',
+                                                    display: 'block',
+                                                    border: '1px solid var(--rule-light)',
+                                                }}
+                                            />
+                                        );
+                                    },
+                                }}
+                            >
+                                {repoNote}
+                            </ReactMarkdown>
+                        </div>
+                    )}
                     {note ? (
                         <ReactMarkdown
                             components={{
@@ -255,7 +287,7 @@ function NotesTab({ slug }: { slug: string }) {
                             {note}
                         </ReactMarkdown>
                     ) : (
-                        <span style={{ color: 'var(--ink3)', fontStyle: 'italic' }}>No notes yet. Click Edit to add some.</span>
+                        !repoNote && <span style={{ color: 'var(--ink3)', fontStyle: 'italic' }}>No notes yet. Click Edit to add some.</span>
                     )}
                 </div>
             )}

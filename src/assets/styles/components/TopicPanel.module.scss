@@ -42,7 +42,7 @@
 .panelHeadline {
     font-family: var(--serif);
     font-size: 24px;
-    font-weight: 900;
+    font-weight: 800;
     line-height: 1.2;
     color: var(--ink);
     overflow-wrap: break-word;
@@ -199,11 +199,11 @@
 }
 
 .codeWorkspace {
-    border: 1px solid #ddd;
+    border: 1px solid var(--rule);
     border-radius: 8px;
     overflow: hidden;
-    background: #fdfdfd;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .colKicker {
@@ -238,8 +238,10 @@
     white-space: nowrap;
 }
 
-.panelBodyText h2 {
+.panelBodyText h2, 
+.panelBodyText h3 {
     font-family: var(--serif);
+    font-weight: 700;
     color: var(--ink);
     margin-top: 1.5em;
     margin-bottom: 0.5em;
@@ -257,15 +259,30 @@
     width: 100%;
     min-height: 200px;
     resize: vertical;
-    background: var(--paper2);
-    border: 0.5px solid var(--rule-light);
+    background: #2a2825; // Darker sepia/slate
+    border: 1.5px solid var(--rule); // Much more visible border
+    border-radius: 8px;
     padding: 16px;
     font-family: var(--body);
     font-size: 14px;
-    color: var(--ink);
+    color: var(--paper); // Light text for dark background
     line-height: 1.8;
     outline: none;
-    transition: border-color 0.15s;
+    transition: all 0.2s;
+
+    &:focus {
+        border-color: var(--red);
+        background: #1a1816;
+    }
+}
+
+.notesViewContainer {
+    min-height: 200px;
+    border: 1.5px solid var(--rule);
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--paper2);
+    color: var(--ink);
 }
 
 .notesSave {

@@ -18,10 +18,18 @@ export default function CodeViewer({ code, language = 'javascript' }: CodeViewer
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const modifiedStyle = {
+        ...oneLight,
+        'comment': { color: '#5c6370', fontStyle: 'italic' },
+        'prolog': { color: '#5c6370', fontStyle: 'italic' },
+        'doctype': { color: '#5c6370', fontStyle: 'italic' },
+        'cdata': { color: '#5c6370', fontStyle: 'italic' },
+    };
+
     return (
         <div className={styles.wrapper}>
-            <button 
-                className={styles.copyBtn} 
+            <button
+                className={styles.copyBtn}
                 onClick={handleCopy}
                 title="Copy Code"
             >
@@ -29,15 +37,16 @@ export default function CodeViewer({ code, language = 'javascript' }: CodeViewer
             </button>
             <SyntaxHighlighter
                 language={language}
-                style={oneLight}
+                style={modifiedStyle}
                 customStyle={{
                     margin: 0,
                     padding: '18px 20px',
                     fontSize: '15px',
                     fontFamily: '"Fira Code", "JetBrains Mono", "Cascadia Code", monospace',
                     lineHeight: '1.75',
-                    borderRadius: '6px',
-                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0,0,0,0.46)',
+                    backgroundColor: '#ffffff',
                 }}
             >
                 {code}

@@ -44,6 +44,14 @@ export default function PracticeEditor({ initialCode, language = 'javascript' }:
         setOutput(logs);
     };
 
+    const modifiedStyle = {
+        ...vs,
+        'comment': { color: '#5c6370', fontStyle: 'italic' },
+        'prolog': { color: '#5c6370', fontStyle: 'italic' },
+        'doctype': { color: '#5c6370', fontStyle: 'italic' },
+        'cdata': { color: '#5c6370', fontStyle: 'italic' },
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.toolbar}>
@@ -70,7 +78,7 @@ export default function PracticeEditor({ initialCode, language = 'javascript' }:
                 <div className={styles.highlighter}>
                     <SyntaxHighlighter
                         language={language}
-                        style={vs}
+                        style={modifiedStyle}
                         customStyle={{
                             margin: 0,
                             padding: '16px',

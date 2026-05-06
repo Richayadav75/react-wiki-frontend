@@ -25,10 +25,10 @@ $col-width: 680px;
 $panel-width: 50vw;
 
 // Fonts
-$serif: 'Playfair Display', 'Georgia', serif;
-$body-font: 'Libre Baskerville', 'Georgia', serif;
+$serif: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$body-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 $mono: 'Source Code Pro', monospace;
-$fraktur: 'UnifrakturMaguntia', cursive;
+$fraktur: 'Outfit', sans-serif; // Fallback to Outfit since Unifraktur is removed
 
 // Export for TSX usage
 :export {

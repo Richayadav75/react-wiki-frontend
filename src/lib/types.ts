@@ -12,5 +12,7 @@ export interface TopicDetail extends Topic {
   practiceCode?: string;
   interviewQuestions?: string;
   interviewContent?: string; // Content from interview.md
+  flowContent?: string;
+  noteContent?: string;
 }
 

@@ -121,20 +121,24 @@ function parseFrontMatter(content: string, slug: string): Topic {
   };
 }
 
-function extractSection(content: string, sectionTitle: string): string | undefined {
+function extractSection(content: string, sectionTitle: string): { section?: string; remaining: string } {
   const regex = new RegExp(
-    `#{2,3}\\s+(?:\\d+\\.\\s+)?${sectionTitle}\\s*:?\\s*\\n([\\s\\S]*?)(?=\\n#{2,3}|$)`,
+    `(?:^|\\n)(?:#{2,3}|\\*\\*)\\s*(?:\\d+\\.\\s+)?${sectionTitle}\\s*:?\\s*(?:\\*\\*)?\\s*\\n([\\s\\S]*?)(?=\\n(?:#{2,3}|\\*\\*|---)|$)`,
     'i'
   );
   const match = content.match(regex);
-  if (!match) return undefined;
+  if (!match) return { remaining: content };
 
-  const sectionContent = match[1].trim();
+  let sectionContent = match[1].trim();
   if (['practice', 'example'].includes(sectionTitle.toLowerCase())) {
     const codeMatch = sectionContent.match(/```(?:\w+)?\n([\s\S]*?)\n```/);
-    if (codeMatch) return codeMatch[1].trim();
+    if (codeMatch) sectionContent = codeMatch[1].trim();
   }
-  return sectionContent;
+
+  return {
+    section: sectionContent,
+    remaining: content.replace(match[0], '').trim()
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -258,7 +262,21 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
       }
       cleanLines.push(line);
     }
-    const cleanContent = cleanLines.join('\n');
+    let currentContent = cleanLines.join('\n');
+
+    // Extract special sections and remove them from main content
+    const practiceResult = extractSection(currentContent, 'Practice');
+    const exampleResult  = extractSection(practiceResult.remaining, 'Example');
+    currentContent = exampleResult.remaining;
+
+    const interviewResult = extractSection(currentContent, 'Interview Questions');
+    currentContent = interviewResult.remaining;
+
+    const flowResult = extractSection(currentContent, 'Working Flow');
+    currentContent = flowResult.remaining;
+
+    const noteResult = extractSection(currentContent, 'Note');
+    currentContent = noteResult.remaining;
 
     let interviewContent: string | undefined;
     try {
@@ -268,10 +286,12 @@ export async function fetchTopicDetail(slug: string): Promise<TopicDetail | null
 
     return {
       ...meta,
-      content: cleanContent,
+      content:            currentContent,
       interviewContent,
-      practiceCode:       extractSection(cleanContent, 'Practice') || extractSection(cleanContent, 'Example'),
-      interviewQuestions: extractSection(cleanContent, 'Interview Questions'),
+      practiceCode:       practiceResult.section || exampleResult.section,
+      interviewQuestions: interviewResult.section,
+      flowContent:        flowResult.section,
+      noteContent:        noteResult.section,
     };
   } catch {
     return null;
