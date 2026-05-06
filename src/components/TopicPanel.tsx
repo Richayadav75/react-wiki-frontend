@@ -219,8 +219,10 @@ function NotesTab({ slug, repoNote }: { slug: string; repoNote?: string }) {
         <div id="tab-notes">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <span className={styles.colKicker} style={{ margin: 0 }}>Your notes (Supports Markdown + Images)</span>
-                {note && !isEditing && (
-                    <button className={styles.notesSave} onClick={() => setIsEditing(true)}>Edit</button>
+                {!isEditing && (
+                    <button className={styles.notesSave} onClick={() => setIsEditing(true)}>
+                        {note ? 'Edit' : 'Add Note'}
+                    </button>
                 )}
             </div>
 
