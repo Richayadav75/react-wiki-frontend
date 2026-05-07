@@ -122,6 +122,43 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                                             }
                                             return <code className={className} {...props}>{children}</code>;
                                         },
+                                        blockquote({ children }) {
+                                            // Flatten children to text to check for keywords
+                                            const getChildText = (nodes: any): string => {
+                                                if (typeof nodes === 'string') return nodes;
+                                                if (Array.isArray(nodes)) return nodes.map(getChildText).join('');
+                                                if (nodes?.props?.children) return getChildText(nodes.props.children);
+                                                return '';
+                                            };
+                                            
+                                            const textContent = getChildText(children).toLowerCase();
+                                            
+                                            if (textContent.includes('best practice')) {
+                                                return <div className={styles.bestPracticeBox}>{children}</div>;
+                                            }
+                                            if (textContent.includes('analogy')) {
+                                                return <div className={styles.analogyBox}>{children}</div>;
+                                            }
+                                            return <blockquote className={styles.standardBlockquote}>{children}</blockquote>;
+                                        },
+                                        img({ src, alt, ...props }) {
+                                            const isSmall = alt?.toLowerCase().includes('small');
+                                            return (
+                                                <img
+                                                    src={src}
+                                                    alt={alt}
+                                                    className={isSmall ? styles.smallImage : ''}
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        borderRadius: '8px',
+                                                        margin: '20px 0',
+                                                        display: 'block',
+                                                        border: '1px solid var(--rule-light)',
+                                                    }}
+                                                    {...props}
+                                                />
+                                            );
+                                        },
                                         a({ node, href, children, ...props }) {
                                             if (href && (href === './interview.md' || href.endsWith('interview.md'))) {
                                                 return (
@@ -243,11 +280,40 @@ function NotesTab({ slug, repoNote }: { slug: string; repoNote?: string }) {
                             <span className={styles.colKicker} style={{ fontSize: '10px', opacity: 0.7 }}>Pinned from Repository</span>
                             <ReactMarkdown
                                 components={{
+                                    code({ node, className, children, ...props }) {
+                                        const match = /language-(\w+)/.exec(className || '');
+                                        if (match) {
+                                            return <CodeViewer code={String(children).replace(/\n$/, '')} language={match[1]} />;
+                                        }
+                                        const isBlock = String(children).includes('\n');
+                                        if (isBlock) {
+                                            return <OutputBlock text={String(children).replace(/\n$/, '')} />;
+                                        }
+                                        return <code className={className} {...props}>{children}</code>;
+                                    },
+                                    blockquote({ children }) {
+                                        const getChildText = (nodes: any): string => {
+                                            if (typeof nodes === 'string') return nodes;
+                                            if (Array.isArray(nodes)) return nodes.map(getChildText).join('');
+                                            if (nodes?.props?.children) return getChildText(nodes.props.children);
+                                            return '';
+                                        };
+                                        const textContent = getChildText(children).toLowerCase();
+                                        if (textContent.includes('best practice')) {
+                                            return <div className={styles.bestPracticeBox}>{children}</div>;
+                                        }
+                                        if (textContent.includes('analogy')) {
+                                            return <div className={styles.analogyBox}>{children}</div>;
+                                        }
+                                        return <blockquote className={styles.standardBlockquote}>{children}</blockquote>;
+                                    },
                                     img({ src, alt, ...props }) {
+                                        const isSmall = alt?.toLowerCase().includes('small');
                                         return (
                                             <img
                                                 src={src}
                                                 alt={alt || ''}
+                                                className={isSmall ? styles.smallImage : ''}
                                                 {...props}
                                                 style={{
                                                     maxWidth: '100%',
@@ -268,11 +334,40 @@ function NotesTab({ slug, repoNote }: { slug: string; repoNote?: string }) {
                     {note ? (
                         <ReactMarkdown
                             components={{
+                                code({ node, className, children, ...props }) {
+                                    const match = /language-(\w+)/.exec(className || '');
+                                    if (match) {
+                                        return <CodeViewer code={String(children).replace(/\n$/, '')} language={match[1]} />;
+                                    }
+                                    const isBlock = String(children).includes('\n');
+                                    if (isBlock) {
+                                        return <OutputBlock text={String(children).replace(/\n$/, '')} />;
+                                    }
+                                    return <code className={className} {...props}>{children}</code>;
+                                },
+                                blockquote({ children }) {
+                                    const getChildText = (nodes: any): string => {
+                                        if (typeof nodes === 'string') return nodes;
+                                        if (Array.isArray(nodes)) return nodes.map(getChildText).join('');
+                                        if (nodes?.props?.children) return getChildText(nodes.props.children);
+                                        return '';
+                                    };
+                                    const textContent = getChildText(children).toLowerCase();
+                                    if (textContent.includes('best practice')) {
+                                        return <div className={styles.bestPracticeBox}>{children}</div>;
+                                    }
+                                    if (textContent.includes('analogy')) {
+                                        return <div className={styles.analogyBox}>{children}</div>;
+                                    }
+                                    return <blockquote className={styles.standardBlockquote}>{children}</blockquote>;
+                                },
                                 img({ src, alt, ...props }) {
+                                    const isSmall = alt?.toLowerCase().includes('small');
                                     return (
                                         <img
                                             src={src}
                                             alt={alt || ''}
+                                            className={isSmall ? styles.smallImage : ''}
                                             {...props}
                                             style={{
                                                 maxWidth: '100%',
