@@ -38,6 +38,7 @@ export default function CodeViewer({ code, language = 'javascript' }: CodeViewer
             <SyntaxHighlighter
                 language={language}
                 style={modifiedStyle}
+                wrapLongLines={false}
                 customStyle={{
                     margin: 0,
                     padding: '18px 20px',
@@ -47,6 +48,7 @@ export default function CodeViewer({ code, language = 'javascript' }: CodeViewer
                     borderRadius: '8px',
                     border: '1px solid rgba(0,0,0,0.46)',
                     backgroundColor: '#ffffff',
+                    overflowX: 'auto',
                 }}
             >
                 {code}

@@ -136,7 +136,19 @@ button {
 
 .gradient-text {
   color: var(--text-primary);
-}/* --- WIKI APP BLOCK (BEM) --- */
+}
+
+/* FlowChart's global .arrow rule conflicts with Prism's .token.arrow on => tokens.
+   Reset any syntax-highlighter token that happens to have the "arrow" class. */
+pre .token.arrow,
+pre .token.arrow * {
+  display: inline !important;
+  padding: 0 !important;
+  flex-direction: unset !important;
+  min-width: unset !important;
+}
+
+/* --- WIKI APP BLOCK (BEM) --- */
 .wiki-app {
     display: flex;
     flex: 1;

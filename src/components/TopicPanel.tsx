@@ -111,6 +111,9 @@ export default function TopicPanel({ topic, isOpen, isExpanded, onToggleExpand, 
                             ) : (
                                 <ReactMarkdown
                                     components={{
+                                        pre({ children }) {
+                                            return <>{children}</>;
+                                        },
                                         code({ node, className, children, ...props }) {
                                             const match = /language-(\w+)/.exec(className || '');
                                             if (match) {
@@ -280,6 +283,9 @@ function NotesTab({ slug, repoNote }: { slug: string; repoNote?: string }) {
                             <span className={styles.colKicker} style={{ fontSize: '10px', opacity: 0.7 }}>Pinned from Repository</span>
                             <ReactMarkdown
                                 components={{
+                                    pre({ children }) {
+                                        return <>{children}</>;
+                                    },
                                     code({ node, className, children, ...props }) {
                                         const match = /language-(\w+)/.exec(className || '');
                                         if (match) {
@@ -334,6 +340,9 @@ function NotesTab({ slug, repoNote }: { slug: string; repoNote?: string }) {
                     {note ? (
                         <ReactMarkdown
                             components={{
+                                pre({ children }) {
+                                    return <>{children}</>;
+                                },
                                 code({ node, className, children, ...props }) {
                                     const match = /language-(\w+)/.exec(className || '');
                                     if (match) {
